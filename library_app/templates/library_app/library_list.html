@@ -1,0 +1,114 @@
+<!-- library_app/templates/library_app/library_list.html -->
+{% extends 'base.html' %}
+
+{% block import_block %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+  <h2>Acai Library List</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Publisher</th>
+        <th>Author</th>
+        <th>Title</th>
+        <th>Page Count</th>
+        <th>Category</th>
+        <th>Shelf Location</th>
+        <th>Published Date</th>
+        <th>Is in Stock</th>
+        <th>Date Checked Out</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for library in libraries %}
+        <tr>
+          <td>{{ library.id }}</td>
+          <td>{{ library.publisher }}</td>
+          <td>{{ library.author }}</td>
+          <td>{{ library.title }}</td>
+          <td>{{ library.page_count }}</td>
+          <td>{{ library.category }}</td>
+          <td>{{ library.shelf_location }}</td>
+          <td>{{ library.published_date }}</td>
+          <td>{% if library.is_in_stock %}Yes{% else %}No{% endif %}</td>
+          <td>{{ library.date_checked_out }}</td>
+          <td>
+            {% if library.is_in_stock %}
+              <button class="checkout-btn" data-book-id="{{ library.id }}">Checkout</button>
+            {% else %}
+              <span>Not Available</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    $(document).on('click', '.checkout-btn', function() {
+      var bookId = $(this).data('book-id');
+      $.ajax({
+        type: 'POST',
+        url: 'library/api/checkout/',
+        contentType: 'application/json',
+        headers: { 'X-CSRFToken': csrf_token }, 
+        data: JSON.stringify({ 'book_id': bookId }),
+        success: function(response) {
+          if (response.success) {
+            alert('Book checked out successfully!');
+            // You can update the UI or perform other actions as needed
+          } else {
+            alert('Failed to check out book. ' + response.error);
+          }
+        },
+        error: function(error) {
+          console.error('Error checking out book:', error);
+        }
+      });
+    });
+  </script>
+
+      <!-- Book Checkout Ajax request -->
+      
+      <!-- <script>
+        $(document).ready(function() {
+        var buttons = document.getElementsByClassName('book-btn');
+
+        for(var i=0; i<buttons.length; i++){
+            buttons[i].addEventListener("click", function(){})
+        };
+
+            $(".book-btn").click(function (e) {
+                checkoutBook($(this));
+            });
+        });
+
+        function checkoutBook(element) {
+        book_id = element[0].getAttribute('value');
+        $.ajax({
+            url: 'library/api/checkout/',
+            type: 'POST',
+            headers: {"X-CSRFToken": '{{ csrf_token }}'},
+            mode: "same-origin",
+            data: {pk: book_id},
+            dataType: "json",
+            success: function (res) {
+                var rowToEdit = document.getElementById("book-row-"+book_id)
+                var newtr = "<tr id='book-row-"+res.id+"'><td>"+res.id+"</td><td>"+res.title+"</td><td>"+res.author+"</td><td>"+res.dateCheckedOut+"</td><td>"+res.isInStock+"</td><td></td></tr>"
+                $("tr#book-row-"+book_id).replaceWith(newtr);
+            },
+            error: function(res) {
+                console.log("error");
+                console.log(res);
+            }
+            
+        });
+    }
+    </script> -->
+  
+{% endblock %}
