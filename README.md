@@ -99,5 +99,3 @@ To log in as a registered user:
 ## Contributing
 
 Feel free to contribute to the development of this application. Create a new branch, make your changes, and submit a pull request.
-
-```
