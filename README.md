@@ -70,7 +70,7 @@ To register a new user, follow these steps:
 python manage.py runserver
 ```
 
-2. Open your web browser and navigate to http://localhost:8000/register/ 
+2. Open your web browser and navigate to http://localhost:8000/library/register/ 
 
 3. Fill out the registration form with the required information.
 
@@ -81,7 +81,7 @@ python manage.py runserver
 
 To log in as a registered user:
 
-1. Navigate to http://localhost:8000/login/
+1. Navigate to http://localhost:8000/library/login/
 
 2. Enter your username and password.
 
