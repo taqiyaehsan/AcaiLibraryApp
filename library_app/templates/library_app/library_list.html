@@ -72,43 +72,5 @@
       });
     });
   </script>
-
-      <!-- Book Checkout Ajax request -->
-      
-      <!-- <script>
-        $(document).ready(function() {
-        var buttons = document.getElementsByClassName('book-btn');
-
-        for(var i=0; i<buttons.length; i++){
-            buttons[i].addEventListener("click", function(){})
-        };
-
-            $(".book-btn").click(function (e) {
-                checkoutBook($(this));
-            });
-        });
-
-        function checkoutBook(element) {
-        book_id = element[0].getAttribute('value');
-        $.ajax({
-            url: 'library/api/checkout/',
-            type: 'POST',
-            headers: {"X-CSRFToken": '{{ csrf_token }}'},
-            mode: "same-origin",
-            data: {pk: book_id},
-            dataType: "json",
-            success: function (res) {
-                var rowToEdit = document.getElementById("book-row-"+book_id)
-                var newtr = "<tr id='book-row-"+res.id+"'><td>"+res.id+"</td><td>"+res.title+"</td><td>"+res.author+"</td><td>"+res.dateCheckedOut+"</td><td>"+res.isInStock+"</td><td></td></tr>"
-                $("tr#book-row-"+book_id).replaceWith(newtr);
-            },
-            error: function(res) {
-                console.log("error");
-                console.log(res);
-            }
-            
-        });
-    }
-    </script> -->
   
 {% endblock %}

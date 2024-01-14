@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard</title>
+</head>
+<body>
+    <h1>Welcome to Your Home Page</h1>
+
+    {% if user.is_authenticated %}
+        <p>Hello, {{ user.username }}!</p>
+        
+        <div> <a href="{% url 'library' %}">Books</a></div>
+
+        <div><a href="{% url 'logout' %}">Logout</a></div>
+        
+    {% else %}
+        <p>Please log in to access more features.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,75 +1,94 @@
 # library_app/views.py
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse
 from .models import Library, UserProfile
 from faker import Faker
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 import random
 from datetime import datetime, timedelta, timezone
 from rest_framework import generics, status
 from rest_framework.response import Response
+from django.views import View
 from .models import Library
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, authenticate
+from .forms import RegistrationForm
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 
 fake = Faker()
 
-def populate_library_data(request):
-    # Generate and populate 200 entries with random data
-    for _ in range(200):
-        Library.objects.create(
-            publisher=fake.company(),
-            author=fake.name(),
-            title=fake.catch_phrase(),
-            page_count=random.randint(50, 1000),
-            category=fake.word(),
-            shelf_location=fake.word(),
-            published_date=fake.date_between(start_date='-10y', end_date='today'),
-            is_in_stock=random.choice([True, False]),
-            date_checked_out=fake.date_between(start_date='-1y', end_date='today') if random.choice([True, False]) else None,
-        )
+class PopulateLibraryDataView(View):
+    def get(self, request, *args, **kwargs):
+        libraries = Library.objects.all()
+        response_content = render(request, 'library_app/library_list.html', {'libraries': libraries})
+        return HttpResponse(response_content)
 
-    libraries = Library.objects.all()
-    return render(request, 'library_app/library_list.html', {'libraries': libraries})
+class LibraryListView(View):
+    def get(self, request, *args, **kwargs):
+        libraries = Library.objects.all()
+        response_content = render(request, 'library_app/library_list.html', {'libraries': libraries})
+        return HttpResponse(response_content)
 
-def library_list(request):
-    libraries = Library.objects.all()
-    return render(request, 'library_app/library_list.html', {'libraries': libraries})
-
-def user_list(request):
-    # if request.user.userprofile.role != 'Admin':
-        # return render(request, 'library_app/access_denied.html')
+# class UserListView(UserPassesTestMixin, View):
+#     def get(self, request, *args, **kwargs):
+#         users = UserProfile.objects.all()
+#         response_content = render(request, 'library_app/user_list.html', {'users': users})
+#         return HttpResponse(response_content)
     
-    users = UserProfile.objects.all()
-    return render(request, 'library_app/user_list.html', {'users': users})
-    
-def register_view(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+#     def test_func(self):
+#         return self.request.user.groups.filter(name='admin').exists()
+
+class UserListView(View):
+    def dispatch(self, request, *args, **kwargs):
+        # Check if the user has the "admin" role
+        if not request.user.is_authenticated or request.user.userprofile.role != 'Admin':
+            return HttpResponse("Access Denied. You do not have permission to access this page.", status=403)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        users = UserProfile.objects.all()
+        response_content = render(request, 'library_app/user_list.html', {'users': users})
+        return HttpResponse(response_content)
+
+class RegisterView(View):
+    def get(self, request, *args, **kwargs):
+        form = RegistrationForm()
+        return render(request, 'registration/register.html', {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        form = RegistrationForm(request.POST)
+        
         if form.is_valid():
             user = form.save()
-
             # Create a UserProfile instance associated with the new user
-            user_profile = UserProfile.objects.create(user=user, role='User')
-
+            role = form.cleaned_data['role']
+            user_profile = UserProfile.objects.create(user=user, role=role)
             login(request, user)
-            return redirect('home')  # Redirect to the home page or another page
-    else:
-        form = UserCreationForm()
+            return redirect('user-dashboard')  
+        
+        return render(request, 'registration/register.html', {'form': form})
 
-    return render(request, 'registration/register.html', {'form': form})
+class LoginView(View):
+    def get(self, request, *args, **kwargs):
+        form = AuthenticationForm()
+        return render(request, 'registration/login.html', {'form': form})
 
-def login_view(request):
-    if request.method == 'POST':
+    def post(self, request, *args, **kwargs):
         form = AuthenticationForm(request, request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('home')  # Replace 'home' with the URL you want to redirect after login
-    else:
-        form = AuthenticationForm()
-
-    return render(request, 'registration/login.html', {'form': form})
+            return redirect('user-dashboard') 
+        return render(request, 'registration/login.html', {'form': form})
+    
+class LogoutView(View):
+    def get(self, request, *args, **kwargs):
+        logout(request)
+        return redirect('home')  # Redirect to the login page after logout
 
 def home_view(request):
     return render(request, 'home.html')
+
+def user_dashboard_view(request):
+    return render(request, 'user_dash.html', {'user': request.user})

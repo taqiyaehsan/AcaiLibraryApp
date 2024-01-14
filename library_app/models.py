@@ -16,9 +16,10 @@ class Library(models.Model):
     is_in_stock = models.BooleanField(default=True)
     date_checked_out = models.DateField(null=True, blank=True)
 
-class UserProfile(models.Model):
+class UserProfile(models.Model): 
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    role = models.CharField(max_length=50, default='User')  
+    role_choices = [('Admin', 'Admin'), ('User', 'User')]
+    role = models.CharField(max_length=50, choices=role_choices)
 
     def __str__(self):
         return self.user.username
