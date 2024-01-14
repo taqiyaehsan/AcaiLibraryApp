@@ -91,7 +91,8 @@ To log in as a registered user:
 ## Additional Features
 
 - Visit the Library List page at http://localhost:8000/library/library/ to see a list of books and their availability.
-- View user list on http://localhost:8000/library/users/
+- Upon login/registration, every user is redirected to a user dashboard with corresponding links to the library inventory and ability to log out.
+- User list is viewable only to users with Admin privileges and can be accessed using the "User List" link in user dashboard.
 - Use the admin interface to manage users, books, and other application data.
 - GET a JSON list of books from http://localhost:8000/library/api/books/ with optional limit parameter http://localhost:8000/api/books/?limit=5 
 - Checkout a book from http://localhost:8000/library/api/checkout/ by entering book ID as {"book_id": 1} (replace the number according to desired book to be checked out)

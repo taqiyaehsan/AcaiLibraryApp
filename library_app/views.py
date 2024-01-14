@@ -27,17 +27,9 @@ class PopulateLibraryDataView(View):
 class LibraryListView(View):
     def get(self, request, *args, **kwargs):
         libraries = Library.objects.all()
-        response_content = render(request, 'library_app/library_list.html', {'libraries': libraries})
+        response_content = render(request, 'library_app/library_list_htmx.html', {'libraries': libraries})
+        # response_content = render(request, 'library_app/library_list_js.html', {'libraries': libraries})
         return HttpResponse(response_content)
-
-# class UserListView(UserPassesTestMixin, View):
-#     def get(self, request, *args, **kwargs):
-#         users = UserProfile.objects.all()
-#         response_content = render(request, 'library_app/user_list.html', {'users': users})
-#         return HttpResponse(response_content)
-    
-#     def test_func(self):
-#         return self.request.user.groups.filter(name='admin').exists()
 
 class UserListView(View):
     def dispatch(self, request, *args, **kwargs):

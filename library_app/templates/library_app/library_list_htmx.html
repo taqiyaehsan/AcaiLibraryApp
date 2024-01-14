@@ -1,0 +1,70 @@
+<!-- library_app/templates/library_app/library_list.html -->
+{% extends 'base.html' %}
+
+{% block import_block %}
+  <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.7.0/dist/htmx.min.js"></script>
+{% endblock %}
+
+{% block content %}
+  <h2>Acai Library List</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Publisher</th>
+        <th>Author</th>
+        <th>Title</th>
+        <th>Page Count</th>
+        <th>Category</th>
+        <th>Shelf Location</th>
+        <th>Published Date</th>
+        <th>Is in Stock</th>
+        <th>Date Checked Out</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for library in libraries %}
+        <tr>
+          <td>{{ library.id }}</td>
+          <td>{{ library.publisher }}</td>
+          <td>{{ library.author }}</td>
+          <td>{{ library.title }}</td>
+          <td>{{ library.page_count }}</td>
+          <td>{{ library.category }}</td>
+          <td>{{ library.shelf_location }}</td>
+          <td>{{ library.published_date }}</td>
+          <td>{% if library.is_in_stock %}Yes{% else %}No{% endif %}</td>
+          <td>{{ library.date_checked_out }}</td>
+          <td>
+            {% if library.is_in_stock %}
+              <button class="checkout-btn" hx-post="{% url 'checkout_api' %}" hx-trigger="click" data-hx-headers="{'X-CSRFToken': getCSRFToken()}">Checkout</button>
+            {% else %}
+              <span>Not Available</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <script>
+    // Get the CSRF token from the cookie
+    function getCSRFToken() {
+      const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+      return csrfCookie ? csrfCookie.split('=')[1] : null;
+    }
+
+    // HTMX configuration to include CSRF token in requests
+    htmx.config.headers = {
+      'X-CSRFToken': getCSRFToken(),
+    };
+
+    // Event handler for the checkout button
+    document.addEventListener('htmx:configRequest', function(event) {
+      if (event.detail.elt.matches('.checkout-btn')) {
+        event.detail.xhr.setRequestHeader('X-CSRFToken', getCSRFToken());
+      }
+    });
+  </script>
+{% endblock %}
