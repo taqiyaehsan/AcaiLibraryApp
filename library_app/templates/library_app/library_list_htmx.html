@@ -2,7 +2,7 @@
 {% extends 'base.html' %}
 
 {% block import_block %}
-  <script src="https://cdn.jsdelivr.net/npm/htmx.org@1.7.0/dist/htmx.min.js"></script>
+<script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 {% endblock %}
 
 {% block content %}
@@ -37,8 +37,14 @@
           <td>{% if library.is_in_stock %}Yes{% else %}No{% endif %}</td>
           <td>{{ library.date_checked_out }}</td>
           <td>
-            {% if library.is_in_stock %}
-              <button class="checkout-btn" hx-post="{% url 'checkout_api' %}" hx-trigger="click" data-hx-headers="{'X-CSRFToken': getCSRFToken()}">Checkout</button>
+            {% if library.is_in_stock %} 
+            <button class="checkout-btn" 
+            id="checkout-button-{{ library.id }}"
+            hx-post="{% url 'checkout_api' %}" 
+            hx-trigger="click" 
+            hx-vals="js:{'pk': {{library.id}}}"
+            data-hx-headers="{'csrf_token: '{{ csrf_token }}''}">Checkout</button>
+            
             {% else %}
               <span>Not Available</span>
             {% endif %}
@@ -48,18 +54,24 @@
     </tbody>
   </table>
 
+  <form method="post" hx-post="{% url 'checkout_api' %}">
+    {% csrf_token %}
+    <!-- Other form fields go here -->
+    <button type="submit" hx-trigger="click">Checkout</button>
+  </form>
+
   <script>
     // Get the CSRF token from the cookie
     function getCSRFToken() {
       const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
       return csrfCookie ? csrfCookie.split('=')[1] : null;
     }
-
+  
     // HTMX configuration to include CSRF token in requests
     htmx.config.headers = {
-      'X-CSRFToken': getCSRFToken(),
+      'X-CSRFToken': getCSRFToken()
     };
-
+  
     // Event handler for the checkout button
     document.addEventListener('htmx:configRequest', function(event) {
       if (event.detail.elt.matches('.checkout-btn')) {

@@ -8,6 +8,7 @@ from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 class BookListAPIView(generics.ListAPIView):
     serializer_class = LibrarySerializer
@@ -26,11 +27,8 @@ class BookListAPIView(generics.ListAPIView):
 
 class CheckoutAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        book_id = request.data.get('book_id')
-        try:
-            book = Library.objects.get(pk=book_id)
-        except Library.DoesNotExist:
-            return Response({'success': False, 'error': 'Book not found'}, status=status.HTTP_404_NOT_FOUND)
+        book_id = request.data['pk']
+        book = Library.objects.get(pk=book_id)
 
         if book.is_in_stock:
             book.is_in_stock = False

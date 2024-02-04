@@ -21,7 +21,7 @@ fake = Faker()
 class PopulateLibraryDataView(View):
     def get(self, request, *args, **kwargs):
         libraries = Library.objects.all()
-        response_content = render(request, 'library_app/library_list.html', {'libraries': libraries})
+        response_content = render(request, 'library_app/library_list_htmx.html', {'libraries': libraries})
         return HttpResponse(response_content)
 
 class LibraryListView(View):

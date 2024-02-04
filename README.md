@@ -95,7 +95,7 @@ To log in as a registered user:
 - User list is viewable only to users with Admin privileges and can be accessed using the "User List" link in user dashboard.
 - Use the admin interface to manage users, books, and other application data.
 - GET a JSON list of books from http://localhost:8000/library/api/books/ with optional limit parameter http://localhost:8000/api/books/?limit=5 
-- Checkout a book from http://localhost:8000/library/api/checkout/ by entering book ID as {"book_id": 1} (replace the number according to desired book to be checked out)
+- Checkout a book by clicking on the checkout button on the book list.
 
 ## Contributing
 

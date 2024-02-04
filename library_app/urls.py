@@ -5,7 +5,7 @@ from .views import home_view, user_dashboard_view
 from .api.views import BookListAPIView, CheckoutAPIView
 
 urlpatterns = [
-    path('library/', LibraryListView.as_view(), name='library'),
+    path('library/', LibraryListView.as_view(), name='library_list_htmx'),
     path('user_list/', UserListView.as_view(), name='user_list'),
     path('populate-library/', PopulateLibraryDataView.as_view(), name='populate_library'),
     path('register/', RegisterView.as_view(), name='register'),
